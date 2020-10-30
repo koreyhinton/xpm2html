@@ -1,0 +1,63 @@
+#!/bin/bash
+
+nl=$'\n'
+legend=$(cat test/Shark90.xpm | cut -d '"' -f 2 | grep ' c ')
+last=$(echo "$legend" | tail -1)
+lineno=$(cat test/Shark90.xpm | grep -n "$last" | cut -d : -f 1)
+((lineno++));
+pixels=$(cat test/Shark90.xpm | tail -n "+${lineno}" | cut -d '"' -f 2 | grep -v "^/\*" | grep -v "^};")
+
+#echo "$pixels"
+html="<table><tr>"
+tr=1
+cachekey=""
+cacheval=""
+tdl="<td style='background-color:"
+tdr="'> </td>"
+for ((i=0;i<${#pixels};i++));
+do
+    if [ $tr -eq 0 ]; then
+        html="${html}<tr>"
+        tr=1
+    fi
+    if [ "${pixels:$i:1}" = "$nl" ]; then
+        html="${html}</tr>";
+        echo "<!-- line -->"
+        tr=0
+    else
+        p="${pixels:$i:1}"
+        #if [ "$cachekey" = "$p" ]; then
+        #    color="$cacheval"
+        #else
+            for ((j=0;j<${#legend};j++));
+            do
+                #echo "$j"
+                if [ "${p}" = "${legend:$j:1}" ]; then
+                    ((j=j+4)); color=""
+                    while [[ ! "${legend:$j:1}" = "$nl" && $j -lt ${#legend}  ]]
+                    do
+                        color="$color${legend:$j:1}"
+                        ((j=j+1))
+                        #echo "${legend:$j:1}"
+                    done
+                    break
+                else
+                    while [[ ! "${legend:$j:1}" = "$nl"  && $j -lt ${#legend} ]]
+                    do
+                        ((j=j+1))
+                        #echo "${legend:$j:1}"
+                    done
+                fi
+            done
+        #fi
+        #cacheval="$color"
+        #cachekey="${pixels:$i:1}"
+        if [ "$color" = "None" ]; then
+            html="${html}<td></td>"
+        else
+            html="${html}${tdl}${color}${tdr}"
+        fi
+    fi
+done
+html="${html}</table>"
+echo "$html"
