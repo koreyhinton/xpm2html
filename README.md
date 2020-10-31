@@ -12,6 +12,23 @@ essentially the XPM must also be a true ascii art image.
 If the image didn't turn out right, first thing to check is if the legend
 inside the xpm file has multiple digits used in the lookup key.
 
+## HACKTOBERFEST
+
+I found myself wanting to read image pixel data from an image format that could
+be easily parsed in code, and I found XPM to be in a human readable format that
+could allow for that.
+
+Once I got the image in that format I wondered which image viewer could view
+this format. I realized it is so easy to parse and read it I could just write
+out the pixels as an html table, each pixel being a TD tag.
+
+I decided to use this as my 2020 Hacktoberfest contribution. It is not
+thoroughly tested and will only work for images containing a small number of
+colors since this code assumes 1 pixel is represented by just 1 character key
+lookup in the xpm file.
+
+Happy Halloween! - Korey 10/31/2020
+
 ## DEMO
 
 ```
@@ -31,7 +48,7 @@ mogrify -format xpm Vampire-Jack-o-Lantern.gif
 # xpm to html conversion
 cat Vampire-Jack-o-Lantern.xpm | xpm2html > Vampire-Jack-o-Lantern.html
 
-# open img.html in the browser
+# open Vampire-Jack-o-Lantern.html in the browser (img.html example below) 
 ```
 
 ![Demo Screen Capture](demo/Capture.PNG)
