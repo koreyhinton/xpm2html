@@ -1,6 +1,8 @@
 #!/bin/bash
 
 xpm=$(cat);
+title="$1"
+: "${title:=xmp2html}"
 
 nl=$'\n'
 legend=$(echo "$xpm" | cut -d '"' -f 2 | grep ' c ')
@@ -8,7 +10,9 @@ last=$(echo "$legend" | tail -1)
 lineno=$(echo "$xpm" | grep -n "$last" | cut -d : -f 1)
 ((lineno++));
 pixels=$(echo "$xpm" | tail -n "+${lineno}" | cut -d '"' -f 2 | grep -v "^/\*" | grep -v "^};")
-declare -A color_lookup
+classes=
+c=0
+declare -A class_lookup
 while read -r line
 do
     sp_cnt=$(echo "$line" | grep -o ' ' | wc -l)
@@ -19,11 +23,20 @@ do
         key=$(echo "$line" | cut -d ' ' -f 1)
         val=$(echo "$line" | cut -d ' ' -f 3)
     fi
-    color_lookup["$key"]="$val"
+    origval="$val"
+    css=
+    if [ "$val" = "None" ]; then
+        css=""
+    else
+        css="background-color:${val}"
+    fi
+    classes="${classes}/*${key}|${val}*/ .c${c}{${css}}"
+    class_lookup["$key"]="c${c}"
+    ((c++));
 done <<< "$legend"
 legend=
 
-html='<html><HEAD><STYLE>
+html='<!DOCTYPE html><html lang="en"><HEAD><TITLE>${title}</TITLE><STYLE>
 * { margin:0; padding:0; font-size:12px}
 table, caption, tbody, tfoot, thead, tr, th, td {
     margin: 0;
@@ -47,30 +60,25 @@ font-family: "Courier New";
 font-size: 100%;
 width:1px;
 height:1px;
-}
-</STYLE></HEAD><body><table><tr>'
+}'
+echo "${html}"
+echo "$classes"
+echo "</STYLE></HEAD><body><table>"
+row="<tr>"
 tr=1
-tdl="<td style='background-color:"
-tdr="'> </td>"
 for ((i=0;i<${#pixels};i++));
 do
     if [ $tr -eq 0 ]; then
-        html="${html}<tr>"
+        row="<tr>"
         tr=1
     fi
     if [ "${pixels:$i:1}" = "$nl" ]; then
-        html="${html}</tr>";
-        echo "<!-- line -->"
+        echo "$row</tr>"
         tr=0
     else
         p="${pixels:$i:1}"
-        color=${color_lookup["$p"]}
-        if [ "$color" = "None" ]; then
-            html="${html}<td></td>"
-        else
-            html="${html}${tdl}${color}${tdr}"
-        fi
+        class=${class_lookup["$p"]}
+        row="${row}<td class='$class'></td>"
     fi
 done
-html="${html}</table></body></html>"
-echo "$html"
+echo "</table></body></html>"
