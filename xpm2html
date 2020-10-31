@@ -8,34 +8,22 @@ last=$(echo "$legend" | tail -1)
 lineno=$(echo "$xpm" | grep -n "$last" | cut -d : -f 1)
 ((lineno++));
 pixels=$(echo "$xpm" | tail -n "+${lineno}" | cut -d '"' -f 2 | grep -v "^/\*" | grep -v "^};")
+declare -A color_lookup
+while read -r line
+do
+    sp_cnt=$(echo "$line" | grep -o ' ' | wc -l)
+    if [ $sp_cnt -eq 1 ]; then
+        key=" "
+        val=$(echo "$line" | cut -d 'c' -f 2 | cut -d ' ' -f 2)
+    else
+        key=$(echo "$line" | cut -d ' ' -f 1)
+        val=$(echo "$line" | cut -d ' ' -f 3)
+    fi
+    color_lookup["$key"]="$val"
+done <<< "$legend"
+legend=
 
-#echo "$pixels"
 html='<html><HEAD><STYLE>
-
-/* table, */
-/* thead, */
-/* tbody, */
-/* tfoot, */
-/* tr, */
-/* th, */
-/* td { */
-/*     /\*display: block;*\/ */
-/*     width: 1px; */
-/*     height: 1px; */
-/*     margin: 0; */
-/*     padding: 0; */
-/*     /\*border: none;*\/ */
-/*     /\*border-collapse: inherit;*\/ */
-/*     /\*border-spacing: 0;*\/ */
-/*     /\*border-color: inherit; */
-/*     vertical-align: inherit; */
-/*     text-align: left; */
-/*     font-weight: inherit;*\/ */
-/*     /\*-webkit-border-horizontal-spacing: 0; */
-/*     -webkit-border-vertical-spacing: 0;*\/ */
-/*  }th, td { */
-/*     /\*display: inline;*\/ */
-/* } */
 * { margin:0; padding:0; font-size:12px}
 table, caption, tbody, tfoot, thead, tr, th, td {
     margin: 0;
@@ -59,14 +47,9 @@ font-family: "Courier New";
 font-size: 100%;
 width:1px;
 height:1px;
-
 }
-
-
 </STYLE></HEAD><body><table><tr>'
 tr=1
-cachekey=""
-cacheval=""
 tdl="<td style='background-color:"
 tdr="'> </td>"
 for ((i=0;i<${#pixels};i++));
@@ -81,32 +64,7 @@ do
         tr=0
     else
         p="${pixels:$i:1}"
-        #if [ "$cachekey" = "$p" ]; then
-        #    color="$cacheval"
-        #else
-            for ((j=0;j<${#legend};j++));
-            do
-                #echo "$j"
-                if [ "${p}" = "${legend:$j:1}" ]; then
-                    ((j=j+4)); color=""
-                    while [[ ! "${legend:$j:1}" = "$nl" && $j -lt ${#legend}  ]]
-                    do
-                        color="$color${legend:$j:1}"
-                        ((j=j+1))
-                        #echo "${legend:$j:1}"
-                    done
-                    break
-                else
-                    while [[ ! "${legend:$j:1}" = "$nl"  && $j -lt ${#legend} ]]
-                    do
-                        ((j=j+1))
-                        #echo "${legend:$j:1}"
-                    done
-                fi
-            done
-        #fi
-        #cacheval="$color"
-        #cachekey="${pixels:$i:1}"
+        color=${color_lookup["$p"]}
         if [ "$color" = "None" ]; then
             html="${html}<td></td>"
         else
