@@ -1,3 +1,24 @@
 Copyright (C) 2020 Korey Hinton. See LICENSE file
 
+NOTE
 
+This current implementation requires images to be in XPM 3 format as outputted
+from mogrify, and the image must have roughly only 90 different colors in it so
+that each color is represented by exactly 1 character in the xpm file,
+essentially the XPM must also be a true ascii art image.
+
+If the image didn't turn out right, first thing to check is if the legend
+inside the xpm file has multiple digits used in the lookup key.
+
+USAGE EXAMPLE
+
+# Make sure xpm2html is in PATH
+chmod +x xpm2html
+
+# Make sure ImageMagick (mogrify) is in PATH
+# Place a file named image.png in the current directory
+cp image.png small.png
+mogrify -geometry x50 small.png  # in-place resize to height of 50
+mogrify -format xpm small.png
+cat small.xpm | xpm2html > small.html
+# open small.html in the browser

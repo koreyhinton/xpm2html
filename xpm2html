@@ -1,14 +1,69 @@
 #!/bin/bash
 
+xpm=$(cat);
+
 nl=$'\n'
-legend=$(cat test/Shark90.xpm | cut -d '"' -f 2 | grep ' c ')
+legend=$(echo "$xpm" | cut -d '"' -f 2 | grep ' c ')
 last=$(echo "$legend" | tail -1)
-lineno=$(cat test/Shark90.xpm | grep -n "$last" | cut -d : -f 1)
+lineno=$(echo "$xpm" | grep -n "$last" | cut -d : -f 1)
 ((lineno++));
-pixels=$(cat test/Shark90.xpm | tail -n "+${lineno}" | cut -d '"' -f 2 | grep -v "^/\*" | grep -v "^};")
+pixels=$(echo "$xpm" | tail -n "+${lineno}" | cut -d '"' -f 2 | grep -v "^/\*" | grep -v "^};")
 
 #echo "$pixels"
-html="<table><tr>"
+html='<html><HEAD><STYLE>
+
+/* table, */
+/* thead, */
+/* tbody, */
+/* tfoot, */
+/* tr, */
+/* th, */
+/* td { */
+/*     /\*display: block;*\/ */
+/*     width: 1px; */
+/*     height: 1px; */
+/*     margin: 0; */
+/*     padding: 0; */
+/*     /\*border: none;*\/ */
+/*     /\*border-collapse: inherit;*\/ */
+/*     /\*border-spacing: 0;*\/ */
+/*     /\*border-color: inherit; */
+/*     vertical-align: inherit; */
+/*     text-align: left; */
+/*     font-weight: inherit;*\/ */
+/*     /\*-webkit-border-horizontal-spacing: 0; */
+/*     -webkit-border-vertical-spacing: 0;*\/ */
+/*  }th, td { */
+/*     /\*display: inline;*\/ */
+/* } */
+* { margin:0; padding:0; font-size:12px}
+table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    border-collapse:collapse;
+    /*font-size: 100%;*/
+    /*vertical-align: baseline;*/
+    /*background: transparent;*/
+}
+td {font-family: "Courier New";
+border-spacing:0;
+-webkit-border-horizontal-spacing: 0;
+vertical-align: baseline;
+font-size: 100%;
+border-collapse: collapse;
+}
+td {
+font-family: "Courier New";
+font-size: 100%;
+width:1px;
+height:1px;
+
+}
+
+
+</STYLE></HEAD><body><table><tr>'
 tr=1
 cachekey=""
 cacheval=""
@@ -59,5 +114,5 @@ do
         fi
     fi
 done
-html="${html}</table>"
+html="${html}</table></body></html>"
 echo "$html"
