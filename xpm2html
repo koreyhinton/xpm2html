@@ -36,7 +36,8 @@ do
 done <<< "$legend"
 legend=
 
-html='<!DOCTYPE html><html lang="en"><HEAD><TITLE>${title}</TITLE><STYLE>
+echo "<!DOCTYPE html><html lang=\"en\"><HEAD><TITLE>${title}</TITLE><STYLE>"
+html='
 * { margin:0; padding:0; font-size:12px}
 table, caption, tbody, tfoot, thead, tr, th, td {
     margin: 0;
@@ -81,4 +82,7 @@ do
         row="${row}<td class='$class'></td>"
     fi
 done
+if [ $tr -eq 1 ]; then
+    echo "$row</tr>"
+fi
 echo "</table></body></html>"

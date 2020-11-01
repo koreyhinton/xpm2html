@@ -29,6 +29,17 @@ lookup in the xpm file.
 
 Happy Halloween! - Korey 10/31/2020
 
+## FUTURE PROGRAM IDEAS
+
+A lossless character reduction program can be added in the pipeline before this
+one to help give more images opportunity to be viewed by this tool. In xpm file
+in the demo folder it shows black being used for multiple characters, that
+could be reduced to just 1 character.
+
+A lossy multi-character reduction program can be added before this program to
+reduce all the multi-character lookups to be a related single-char lookup. This
+would at least slightly change the look of the image.
+
 ## DEMO
 
 ```
@@ -46,7 +57,8 @@ mogrify -format xpm Vampire-Jack-o-Lantern.gif
 #     cat Vampire-Jack-o-Lantern.xpm
 
 # xpm to html conversion
-cat Vampire-Jack-o-Lantern.xpm | xpm2html > Vampire-Jack-o-Lantern.html
+title="Vampire-Jack-o-Lantern as html"  # title arg is optional
+cat Vampire-Jack-o-Lantern.xpm | xpm2html "$title" > Vampire-Jack-o-Lantern.html
 
 # open Vampire-Jack-o-Lantern.html in the browser (img.html example below) 
 ```
